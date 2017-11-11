@@ -1,24 +1,34 @@
 package elements;
 
-//import utils.Drawing;
 import java.awt.Graphics;
-import java.io.Serializable;
+import utils.Drawing;
 
 /**
- * Projeto de POO 2017
- * 
- * @author Luiz Eduardo
- * Baseado em material do Prof. Jose Fernando Junior
+ *
+ * @author Felipe
  */
-public class Caminho extends Element implements Serializable{
+public class BackgroundElement extends Element{
+    private String tipo;
     private boolean hasPowerPellet;
     private int i, j;
-    
-    public Caminho(String imageName) {
+
+    public BackgroundElement(String tipo, String imageName) {
         super(imageName);
-        this.hasPowerPellet = true;
+        this.tipo = tipo;
+        if (tipo.equals("parede"))
+            this.isTransposable = false;
+        if (tipo.equals("caminho"))
+            this.hasPowerPellet = true;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+    
     public int getI() {
         return i;
     }
@@ -45,9 +55,10 @@ public class Caminho extends Element implements Serializable{
     
     @Override
     public void autoDraw(Graphics g) {
+        if (this.tipo.equals("parede"))
+            Drawing.draw(g, this.imageIcon, pos.getY(), pos.getX());
         //Drawing.draw(g, this.imageIcon, pos.getY(), pos.getX());
         /*if(!this.moveRight())
             Drawing.getGameScreen().removeElement(this);*/
     }
-    
 }

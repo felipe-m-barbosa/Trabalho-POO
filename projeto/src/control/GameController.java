@@ -2,12 +2,8 @@ package control;
 
 import elements.*;
 import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import utils.Consts;
 
@@ -40,11 +36,10 @@ public class GameController {
             elemArray.get(i).autoDraw(g);
         }
     }
-    public void processAllElements(ArrayList<Element> e){
+    public void processAllElements(ArrayList<Element> e, Pacman pacman){
         if(e.isEmpty())
             return;
         
-        Pacman pacman = (Pacman)e.get(e.size()-1);
         if (!isValidPosition(e, pacman)) {
             pacman.backToLastPosition();
             pacman.setMovDirection(Pacman.STOP);
@@ -52,7 +47,7 @@ public class GameController {
         }
         
         Element eTemp;
-        Caminho powerPellet;
+        BackgroundElement powerPellet;
         
         for(int i = 1; i < e.size(); i++){
             eTemp = e.get(i);
@@ -60,22 +55,17 @@ public class GameController {
             {
                 if(eTemp.isTransposable())
                 {
-                    if (eTemp instanceof Caminho)
+                    if (eTemp instanceof BackgroundElement)
                     {
-                        powerPellet = (Caminho)eTemp;
-                        if (powerPellet.getHasPowerPellet())
+                        if (((BackgroundElement)eTemp).getTipo().equals("caminho"))
                         {
-                            powerPellet.setHasPowerPellet(false);
-                            ((Caminho) eTemp).imageIcon = this.imageIcon;
-                            eTemp.autoDraw(tela);
-                            /*try {
-                                newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + "bricks.png");
-                                tela.drawImage(newImage, (int)powerPellet.pos.getY() * Consts.CELL_SIZE, (int)powerPellet.pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
-                            } catch (IOException ex) {
-                                Logger.getLogger(GameController.class.getName()).log(Level.SEVERE, null, ex);
-                            }*/
-                            
-                            
+                            powerPellet = (BackgroundElement)eTemp;
+                            if (powerPellet.getHasPowerPellet())
+                            {
+                                powerPellet.setHasPowerPellet(false);
+                                ((BackgroundElement) eTemp).imageIcon = this.imageIcon;
+                                eTemp.autoDraw(tela);
+                            }
                         }
                     }
                 }
@@ -89,10 +79,14 @@ public class GameController {
     public boolean isValidPosition(ArrayList<Element> elemArray, Element elem){
         Element elemAux;
         for(int i = 1; i < elemArray.size(); i++){
-            elemAux = elemArray.get(i);            
-            if(!elemAux.isTransposable())
-                if(elemAux.overlap(elem))
-                    return false;
+            if(!(elemArray.get(i) instanceof Pacman))
+            {
+                elemAux = elemArray.get(i);
+                
+                if(!elemAux.isTransposable())
+                    if(elemAux.overlap(elem))
+                        return false;
+            }
         }        
         return true;
     }

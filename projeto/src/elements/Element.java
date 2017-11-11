@@ -12,8 +12,8 @@ import javax.swing.ImageIcon;
 /**
  * Projeto de POO 2017
  * 
- * @author Luiz Eduardo
- * Baseado em material do Prof. Jose Fernando Junior
+ * @author Felipe
+ * Baseado em material do Prof. Luiz Eduardo
  */
 public abstract class Element implements Serializable{
 

@@ -21,6 +21,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import utils.Som;
 
 /**
  * Projeto de POO 2017
@@ -29,7 +30,7 @@ import javax.swing.ImageIcon;
  * Baseado em material do Prof. Luiz Eduardo
  */
 public class Stage extends javax.swing.JFrame implements KeyListener {
-    
+    public Som som;
     public ImageIcon imageIcon;
     private Pacman pacman;
     private CabecalhoSalvamento cabecalho;
@@ -61,7 +62,9 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     };
 
     public Stage() 
-    {
+    {        
+        som = new Som();
+        som.tocar();
         Drawing.setGameScreen(this);
         initComponents();
         
@@ -95,6 +98,7 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     
     @Override
     public void paint(Graphics gOld) {
+        
         Graphics g = getBufferStrategy().getDrawGraphics();
         
         /*Criamos um contexto grafico*/
@@ -142,7 +146,7 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         }
         
         this.controller.drawAllElements(elementosCenario, g2);
-        this.controller.processAllElements(elementosCenario, pacman);
+        this.controller.processAllElements(elementosCenario, pacman, som);
         this.setTitle("Posição atual: " + pacman.getStringPosition());
         
         g.dispose();
@@ -156,7 +160,6 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         TimerTask task = new TimerTask() {
             
             public void run() {
-                
                 repaint();
             }
         };
@@ -167,15 +170,28 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     public void keyPressed(KeyEvent e) {
         
         if (e.getKeyCode() == KeyEvent.VK_UP) {
+            //Se estava parado, então reiniciar o som
+            if(pacman.getMovDirection() == Pacman.STOP){
+                som.tocar();
+            }
             pacman.setMovDirection(Pacman.MOVE_UP);
             pacman.novaImagem("pacman_cima.png");
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            if(pacman.getMovDirection() == Pacman.STOP){
+                som.tocar();
+            }
             pacman.setMovDirection(Pacman.MOVE_DOWN);
             pacman.novaImagem("pacman_baixo.png");
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            if(pacman.getMovDirection() == Pacman.STOP){
+                som.tocar();
+            }
             pacman.setMovDirection(Pacman.MOVE_LEFT);
             pacman.novaImagem("pacman_esquerda.png");
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            if(pacman.getMovDirection() == Pacman.STOP){
+                som.tocar();
+            }
             pacman.setMovDirection(Pacman.MOVE_RIGHT);
             pacman.novaImagem("pacman_direita.png");
         } else if (e.getKeyCode() == KeyEvent.VK_S)

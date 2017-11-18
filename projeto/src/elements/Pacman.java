@@ -1,5 +1,6 @@
 package elements;
 
+//import java.awt.Color;
 import utils.Drawing;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -14,8 +15,8 @@ import utils.Consts;
 /**
  * Projeto de POO 2017
  * 
- * @author Luiz Eduardo
- * Baseado em material do Prof. Jose Fernando Junior
+ * @author Felipe
+ * Baseado em material do Prof. Luiz Eduardo
  */
 public class Pacman extends Element  implements Serializable{
     
@@ -35,6 +36,8 @@ public class Pacman extends Element  implements Serializable{
     
     @Override
     public void autoDraw(Graphics g){
+        //g.setColor(Color.yellow);
+        //g.fillArc((int)this.pos.getX(), (int)this.pos.getY(), Consts.CELL_SIZE, Consts.CELL_SIZE, 0, 90);
         Drawing.draw(g, this.imageIcon, pos.getY(), pos.getX());
     }
 
@@ -44,6 +47,10 @@ public class Pacman extends Element  implements Serializable{
     
     public void setMovDirection(int direction) {
         movDirection = direction;
+    }
+
+    public int getMovDirection() {
+        return movDirection;
     }
     
     public void move() {
@@ -63,6 +70,7 @@ public class Pacman extends Element  implements Serializable{
         }
     }
 
+    //Método usado na atualização da imagem do personagem de acordo com a direção de seu movimento
     public void novaImagem(String nomeImagem) {
         try {
             ImageIcon imageIcon = new ImageIcon(new java.io.File(".").getCanonicalPath() + Consts.PATH + nomeImagem);
@@ -75,6 +83,4 @@ public class Pacman extends Element  implements Serializable{
             Logger.getLogger(Pacman.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
 }

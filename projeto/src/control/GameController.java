@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import utils.Consts;
+import utils.Som;
 
 /**
  * Projeto de POO 2017
@@ -36,13 +37,15 @@ public class GameController {
             elemArray.get(i).autoDraw(g);
         }
     }
-    public void processAllElements(ArrayList<Element> e, Pacman pacman){
+    
+    public void processAllElements(ArrayList<Element> e, Pacman pacman, Som som){
         if(e.isEmpty())
             return;
         
         if (!isValidPosition(e, pacman)) {
             pacman.backToLastPosition();
             pacman.setMovDirection(Pacman.STOP);
+            som.parar();
             return;
         }
         

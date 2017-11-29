@@ -5,8 +5,8 @@ import java.io.Serializable;
 /**
  * Projeto de POO 2017
  * 
- * @author Luiz Eduardo
- * Baseado em material do Prof. Jose Fernando Junior
+ * @author Felipe
+ * Baseado em material do Prof. Luiz Eduardo
  */
 public class Position implements Serializable {
     /* Elements are positioned in a grid layout (integers).

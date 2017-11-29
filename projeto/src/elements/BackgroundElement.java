@@ -1,24 +1,53 @@
 package elements;
 
 import java.awt.Graphics;
-import utils.Drawing;
 
 /**
  *
  * @author Felipe
  */
 public class BackgroundElement extends Element{
+    
     private String tipo;
-    private boolean hasPowerPellet;
+    private String tipoFruta;
+    private boolean temPacDot;
+    private boolean temPowerPallet;
+    private boolean temFruta;
+    
     private int i, j;
 
+    //Construtor de BackGroundElement, utiliza o construtor de Element mais o que diz respeito a backGround
     public BackgroundElement(String tipo, String imageName) {
         super(imageName);
         this.tipo = tipo;
         if (tipo.equals("parede"))
             this.isTransposable = false;
         if (tipo.equals("caminho"))
-            this.hasPowerPellet = true;
+            this.temPacDot = true;
+    }
+
+    public String getTipoFruta() {
+        return tipoFruta;
+    }
+
+    public void setTipoFruta(String tipoFruta) {
+        this.tipoFruta = tipoFruta;
+    }
+
+    public boolean isTemPowerPallet() {
+        return temPowerPallet;
+    }
+
+    public void setTemPowerPallet(boolean temPowerPallet) {
+        this.temPowerPallet = temPowerPallet;
+    }
+
+    public boolean isTemFruta() {
+        return temFruta;
+    }
+
+    public void setTemFruta(boolean temFruta) {
+        this.temFruta = temFruta;
     }
 
     public String getTipo() {
@@ -45,20 +74,16 @@ public class BackgroundElement extends Element{
         this.j = j;
     }
     
-    public boolean getHasPowerPellet() {
-        return hasPowerPellet;
+    public boolean getTemPacDot() {
+        return temPacDot;
     }
 
-    public void setHasPowerPellet(boolean isPowerPellet) {
-        this.hasPowerPellet = isPowerPellet;
+    public void setTemPacDot(boolean isPowerPellet) {
+        this.temPacDot = isPowerPellet;
     }
     
     @Override
     public void autoDraw(Graphics g) {
-        if (this.tipo.equals("parede"))
-            Drawing.draw(g, this.imageIcon, pos.getY(), pos.getX());
-        //Drawing.draw(g, this.imageIcon, pos.getY(), pos.getX());
-        /*if(!this.moveRight())
-            Drawing.getGameScreen().removeElement(this);*/
     }
+    
 }

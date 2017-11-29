@@ -1,6 +1,8 @@
 package control;
 
 import elements.*;
+import java.awt.Color;
+import java.awt.Font;
 import utils.Consts;
 import utils.Drawing;
 import java.awt.Graphics;
@@ -26,54 +28,139 @@ import utils.Som;
 /**
  * Projeto de POO 2017
  * 
- * @author Felipe
+ * @author Felipe, João
  * Baseado em material do Prof. Luiz Eduardo
  */
 public class Stage extends javax.swing.JFrame implements KeyListener {
+    
+    public long tempo = 0;
+    public static long tempoInicio;
+    public static Graphics g;
+    public static Graphics g2;
+    public int fase = 0;
+    public static int numPacDots = 0;
     public Som som;
     public ImageIcon imageIcon;
     private Pacman pacman;
+    private Fantasma vermelho;
+    private Fantasma ciano;
+    private Fantasma rosa;
+    private Fantasma laranja;
     private CabecalhoSalvamento cabecalho;
     private final ArrayList<Element> elementosCenario;
     ArrayList<Element> paredes = null;
     ArrayList<Element> caminho = null;
     private final GameController controller = new GameController();
-    private char mapa[][] = {
-    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
-    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
-    {'|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|'},
-    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
-    {'|', ' ', '|', '|', '|', '|', '|', '|', '|', ' ', ' ', '|', '|', '|', '|', '|', '|', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', '|', '|', ' ', ' ', '|', '|', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', '|', '|', '|', '|', '|', '|', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
-    {'|', ' ', '|', '|', '|', '|', '|', '|', '|', ' ', ' ', '|', '|', '|', '|', '|', '|', '|', ' ', '|'},
-    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
-    {'|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|', '|'},
-    };
+    private final char mapa[][][] ={{
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'^', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '^', '^', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '^', '^', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '^', '^', '^', '|', ' ', '^', '|', ' ', '^', '^', '^', '^', '^', '^', '^', '^', ' ', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '+', ' ', '^', '|', ' ', '_', '_', '_', '^', '^', '_', '_', '+', ' ', '^', '|', ' ', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '^', '^', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
+    {'|', ' ', '^', '^', '^', '|', ' ', '^', '^', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '+', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '^', '_', '_', ' ', ' ', '_', '_', '|', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'_', '_', '_', '_', '_', '_', ' ', '_', '+', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '_', '+', ' ', '_', '_', '_', '_', '_', '+'},
+    {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+    {'^', '_', '_', '_', '_', '_', ' ', '^', '|', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '^', '|', ' ', '_', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '^', '^', '^', '|', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '^', '^', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '|', ' ', '^', '|', ' ', '^', '|', ' ', '^', '|', ' ', '^', '|', ' ', '^', '|', ' ', '^', '_', '_', '_', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', '|', ' ', '^', '|', ' ', '^', '|', ' ', '_', '+', ' ', '^', '|', ' ', '^', '|', ' ', '|', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '_', '+', ' ', '+', ' ', '^', '|', ' ', '_', '+', ' ', ' ', ' ', ' ', '_', '+', ' ', '^', '|', ' ', '+', ' ', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+'},
+    },
+        
+    {
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'^', '_', '_', '_', '_', '_', '^', '_', '_', '_', '_', '^', '_', '_', '_', '^', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '_', '_', '+', ' ', '+', ' ', '_', '+', ' ', '+', ' ', '|', ' ', '+', ' ', '|', ' ', '_', '+', ' ', '_', '_', '_', '|', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
+    {'^', '_', '+', ' ', '^', '_', '_', '_', '_', '^', '_', '_', '_', '_', '+', ' ', '^', '_', '_', '_', '+', ' ', '_', '|', ' ', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|'},
+    {'|', ' ', '|', ' ', '+', ' ', '^', '+', ' ', '_', '+', ' ', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '|', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '|', ' ', '|', ' ', '+', ' ', '^', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '+', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|', ' ', '+', ' ', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', '^', '_', '|', ' ', '|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '|', ' ', '+', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '|', ' ', '+', ' ', '|', ' ', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '+', ' ', ' ', ' ', '|', ' ', ' ', ' ', '^', '_', '_', ' ', ' ', '_', '_', '|', ' ', ' ', ' ', '|', ' ', '+', ' ', '|', ' ', '|'},
+    {'|', ' ', ' ', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|', ' ', '|', ' ', ' ', ' ', '|', ' ', '|'},
+    {'|', ' ', '|', ' ', '|', ' ', '+', ' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|', ' ', '+', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '|', ' ', '|', ' ', ' ', ' ', '|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '|', ' ', ' ', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|', ' ', '|', ' ', '|', ' ', '|'},
+    {'|', ' ', '+', ' ', '|', ' ', '|', ' ', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '+', ' ', '|', ' ', '+', ' ', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '|', ' ', '|', ' ', '_', '_', '_', '_', '_', '_', '^', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '^', '_', '+', ' ', '|'},
+    {'|', ' ', '|', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|'},
+    {'|', ' ', '+', ' ', '_', '^', '_', '_', '+', ' ', '_', '_', '_', '^', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '+', ' ', '|', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '|'},
+    {'|', ' ', '_', '+', ' ', '_', '+', ' ', '_', '_', '|', ' ', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+'},
+    },
+            
+    {
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+    {'^', '_', '_', '_', '_', '_', '_', '_', '^', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '^', '_', '_', '_', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', ' ', '_', '_', '_', '_', '+', ' ', ' ', ' ', '_', '^', '|', ' ', '_', '^', '^', '+', ' ', ' ', ' ', '_', '_', '_', '_', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '^', '|', ' ', ' ', '^', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '^', '_', '_', ' ', '^', '_', '_', '_', '|', ' ', '_', '_', '+', ' ', '_', '+', ' ', '^', '_', '_', '_', '|', ' ', '_', '_', '^', '|'},
+    {'|', '+', ' ', ' ', ' ', '_', ' ', ' ', ' ', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', '+', ' ', ' ', ' ', '_', '|'},
+    {'|', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', '^', '|', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|'},
+    {'^', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '+', ' ', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '+', ' ', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '_', '+', ' ', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '+', ' ', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '^', '+', ' ', ' ', '_', '^', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '_', '+', ' ', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '+', ' ', '_', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '_', '+', ' ', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '+', ' ', '_', '_', '|'},
+    {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'^', '+', ' ', '_', '_', '^', '_', '+', ' ', '_', '_', '_', '_', '^', '^', '_', '_', '_', '+', ' ', '_', '_', '^', '_', '+', ' ', '_', '|'},
+    {'^', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '_', '+', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '+', ' ', ' ', ' ', ' ', '|'},
+    {'^', '+', ' ', '|', ' ', ' ', ' ', '^', '_', '_', '_', '|', ' ', ' ', ' ', ' ', '^', '_', '_', '_', '|', ' ', ' ', ' ', '|', ' ', '_', '|'},
+    {'|', ' ', ' ', '+', ' ', '_', '^', '+', ' ', ' ', ' ', '_', '^', '^', '^', '^', '_', ' ', ' ', ' ', '_', '^', '+', ' ', '+', ' ', ' ', '|'},
+    {'|', ' ', '+', ' ', ' ', ' ', '+', ' ', ' ', '|', ' ', ' ', '_', '_', '_', '+', ' ', ' ', '|', ' ', ' ', '+', ' ', ' ', ' ', '+', ' ', '|'},
+    {'|', ' ', ' ', ' ', '|', ' ', ' ', ' ', '^', '^', '^', ' ', ' ', ' ', ' ', ' ', ' ', '^', '^', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|'},
+    {'_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '+'},
+    }};
 
     public Stage() 
-    {        
+    {
         som = new Som();
         som.tocar();
-        Drawing.setGameScreen(this);
-        initComponents();
         
+        //O que a linha abaixo ta fazendo ?? Precisa dessa porra ??
+        Drawing.setGameScreen(this);
+        
+        //Pq esse init componentes não cria a porra do label ?? Ou será que cria ??
+        initComponents();
+
         this.addKeyListener(this);   /*teclado*/
         
-        /*Cria a janela do tamanho do tabuleiro + insets (bordas) da janela*/
+        //Cria a janela do tamanho do tabuleiro + insets (bordas) da janela/
         this.setSize(Consts.NUM_CELLS * Consts.CELL_SIZE + getInsets().left + getInsets().right,
                      Consts.NUM_CELLS * Consts.CELL_SIZE + getInsets().top + getInsets().bottom);
-
+        
         elementosCenario = new ArrayList<Element>();
         
         //Verifica se há algum progresso salvo
@@ -98,111 +185,102 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     
     @Override
     public void paint(Graphics gOld) {
+        g = getBufferStrategy().getDrawGraphics();
         
-        Graphics g = getBufferStrategy().getDrawGraphics();
+        //Criamos um contexto grafico/
+        g2 = g.create(getInsets().right, getInsets().top, getWidth() - getInsets().left, getHeight() - getInsets().bottom);
         
-        /*Criamos um contexto grafico*/
-        Graphics g2 = g.create(getInsets().right, getInsets().top, getWidth() - getInsets().left, getHeight() - getInsets().bottom);
-        
-        /* DESENHA CENARIO
-           Trocar essa parte por uma estrutura mais bem organizada
-           Utilizando a classe Stage
-        */
-        for (int i = 0; i < Consts.NUM_CELLS; i++) {
-            for (int j = 0; j < Consts.NUM_CELLS; j++) {
+        for (int i = 1; i < elementosCenario.size(); i++) {
+            if ((elementosCenario.get(i) instanceof BackgroundElement))
+            {
                 try {
-                    if(mapa[i][j] == ' ')
-                    {
-                        BackgroundElement caminhoaux = null;
-                        Image newImage;
-                        for (int k = 0; k < elementosCenario.size(); k++)
-                        {
-                            if (elementosCenario.get(k) instanceof BackgroundElement)
-                            {
-                                if (((BackgroundElement)elementosCenario.get(k)).getTipo().equals("caminho"))
-                                {
-                                    caminhoaux = (BackgroundElement)elementosCenario.get(k);
-                                    if(caminhoaux.getI() == i && caminhoaux.getJ() == j)
-                                    {
-                                        if(caminhoaux.getHasPowerPellet())
-                                        {
-                                            newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + "powerpellet.png");
-                                        }
-                                        else
-                                        {
-                                            newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + "bricks.png");
-                                        }
-                                        g2.drawImage(newImage, j * Consts.CELL_SIZE, i * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);  
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }                   
+                    Image newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + elementosCenario.get(i).getNomeImagem());
+                    g2.drawImage(newImage, (int)elementosCenario.get(i).pos.getY() * Consts.CELL_SIZE, (int)elementosCenario.get(i).pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
                 } catch (IOException ex) {
                     Logger.getLogger(Stage.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         
-        this.controller.drawAllElements(elementosCenario, g2);
-        this.controller.processAllElements(elementosCenario, pacman, som);
-        this.setTitle("Posição atual: " + pacman.getStringPosition());
+        String vidas = "Vidas: ";
+        vidas = vidas + Integer.toString(pacman.vidas);
+        String pontos = "Pontos: ";
+        pontos = pontos + Integer.toString(pacman.pontuacao);
+        String faseString = "Fase: ";
+        faseString = faseString + Integer.toString(fase);
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        g2.drawString(vidas, 5, 15);
+        g2.drawString(pontos, 5, 35);
+        g2.setFont(new Font("TimesRoman", Font.BOLD, 30));
+        g2.drawString(faseString, 220, 25);
+        
+        this.controller.drawDynamicElements(elementosCenario, g2);
+        this.controller.processAllElements(elementosCenario, pacman, vermelho, rosa, ciano, laranja,som);
+        
         
         g.dispose();
         g2.dispose();
         if (!getBufferStrategy().contentsLost()) {
             getBufferStrategy().show();
         }
+        
     }
     
     public void go() {
         TimerTask task = new TimerTask() {
-            
             public void run() {
                 repaint();
+                if (numPacDots == 0)
+                {
+                    //Inicia a próxima fase
+                    fase++;
+                    elementosCenario.clear();
+                    novoJogo();
+                }
+                
+                if ((System.currentTimeMillis() - tempoInicio)/1000 > 20)
+                {
+                    System.out.println("DEUUUUUUUUUU");
+                    tempoInicio = System.currentTimeMillis();
+                }
             }
         };
         Timer timer = new Timer();
         timer.schedule(task, 0, Consts.DELAY);
+        
     }
     
+    //Função que muda o movimento do pacman de acordo com a tecla pressionada
     public void keyPressed(KeyEvent e) {
-        
-        if (e.getKeyCode() == KeyEvent.VK_UP) {
-            //Se estava parado, então reiniciar o som
-            if(pacman.getMovDirection() == Pacman.STOP){
-                som.tocar();
-            }
-            pacman.setMovDirection(Pacman.MOVE_UP);
-            pacman.novaImagem("pacman_cima.png");
-        } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if(pacman.getMovDirection() == Pacman.STOP){
-                som.tocar();
-            }
-            pacman.setMovDirection(Pacman.MOVE_DOWN);
-            pacman.novaImagem("pacman_baixo.png");
-        } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if(pacman.getMovDirection() == Pacman.STOP){
-                som.tocar();
-            }
-            pacman.setMovDirection(Pacman.MOVE_LEFT);
-            pacman.novaImagem("pacman_esquerda.png");
-        } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if(pacman.getMovDirection() == Pacman.STOP){
-                som.tocar();
-            }
-            pacman.setMovDirection(Pacman.MOVE_RIGHT);
-            pacman.novaImagem("pacman_direita.png");
-        } else if (e.getKeyCode() == KeyEvent.VK_S)
-        {
-            salvarJogo();
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_UP:
+                //Se estava parado, então reiniciar o som
+                if(pacman.getMovDirection() == Pacman.STOP){
+                    som.tocar();
+                }   pacman.setMovDirection(Pacman.MOVE_UP);
+                break;
+            case KeyEvent.VK_DOWN:
+                if(pacman.getMovDirection() == Pacman.STOP){
+                    som.tocar();
+                }   pacman.setMovDirection(Pacman.MOVE_DOWN);
+                break;
+            case KeyEvent.VK_LEFT:
+                if(pacman.getMovDirection() == Pacman.STOP){
+                    som.tocar();
+                }   pacman.setMovDirection(Pacman.MOVE_LEFT);
+                break;
+            case KeyEvent.VK_RIGHT:
+                if(pacman.getMovDirection() == Pacman.STOP){
+                    som.tocar();
+                }   pacman.setMovDirection(Pacman.MOVE_RIGHT);
+                break;
+            case KeyEvent.VK_S:
+                salvarJogo();
+                break;
+            default:
+                break;
         }
-        /*else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            pacman.setMovDirection(Pacman.STOP);
-        }*/
-        
-        //repaint(); /*invoca o paint imediatamente, sem aguardar o refresh*/
     }
     
     private void salvarJogo()
@@ -287,28 +365,60 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     
     private void novoJogo()
     {
+        //toda vez q começo um novo jogo, seto o valor de tempo inicial para este momento
+        tempoInicio = System.currentTimeMillis();
+        
         paredes = new ArrayList<Element>();
         caminho = new ArrayList<Element>();
 
-        /*Cria e adiciona os elementos do cenario*/
+        //Cria e adiciona os elementos do cenario/
         for (int i = 0; i < Consts.NUM_CELLS; i++) {
             for (int j = 0; j < Consts.NUM_CELLS; j++) {
-                if(mapa[i][j] == '|')
+                if(mapa[fase][i][j] == '|')
                 {
-                    BackgroundElement parede = new BackgroundElement("parede","coracao.png");
+                    BackgroundElement parede = new BackgroundElement("parede","parede_lateral.png");
                     parede.setPosition(i, j);
                     paredes.add(parede);
                 }
-                else if(mapa[i][j] == ' ')
+                else if(mapa[fase][i][j] == '_')
                 {
-                    BackgroundElement caminhoLivre = new BackgroundElement("caminho","powerpellet.png");
+                    BackgroundElement parede = new BackgroundElement("parede","parede_baixo.png");
+                    parede.setPosition(i, j);
+                    paredes.add(parede);
+                }
+                else if(mapa[fase][i][j] == '+')
+                {
+                    BackgroundElement parede = new BackgroundElement("parede","quina.png");
+                    parede.setPosition(i, j);
+                    paredes.add(parede);
+                }
+                else if(mapa[fase][i][j] == '^')
+                {
+                    BackgroundElement parede = new BackgroundElement("parede","quina_sem_borda.png");
+                    parede.setPosition(i, j);
+                    paredes.add(parede);
+                }
+                else if(mapa[fase][i][j] == ' ')
+                {
+                    BackgroundElement caminhoLivre = new BackgroundElement("caminho","caminho_vinho_com_pp.png");
                     caminhoLivre.setPosition(i, j);
                     caminhoLivre.setI(i);
                     caminhoLivre.setJ(j);
                     caminho.add(caminhoLivre);
                 }
+                else if(mapa[fase][i][j] == '*')
+                {
+                    BackgroundElement fundoCabecalho = new BackgroundElement("fundoCabecalho","caminho_vinho.png");
+                    fundoCabecalho.setPosition(i, j);
+                    fundoCabecalho.setI(i);
+                    fundoCabecalho.setJ(j);
+                    //Será que adicionar o fundoCabecalho como parede da merda ?
+                    paredes.add(fundoCabecalho);
+                }
             }
-        } 
+        }
+        
+        //O cabeçalho salva o número de paredes e caminhos, para
         cabecalho = new CabecalhoSalvamento(paredes.size(), caminho.size());
         this.addElement(cabecalho);
         for (int i = 0; i < paredes.size(); i++)
@@ -321,9 +431,18 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
             this.addElement(caminho.get(i));
         }
 
-        pacman = new Pacman("pacman_frente.png");
+        pacman = new Pacman("pacman_direita.png");
         pacman.setPosition(3, 1);
+        pacman.go();
         this.addElement(pacman);
+        
+        //Esse trecho coloca os fantasmas no mapa
+        vermelho = new Fantasma("blinky_baixo.png");
+        vermelho.setPosition(14, 14);
+        this.addElement(vermelho);
+        
+        //Número de PacDots do cenário. Quando chega a 0, mudamos de fase.
+        numPacDots = caminho.size();
     }
     
     /**
@@ -335,48 +454,30 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SCC0604 - Pacman");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setForeground(java.awt.Color.black);
         setLocation(new java.awt.Point(20, 20));
         setMaximumSize(new java.awt.Dimension(214765432, 214765432));
+        setPreferredSize(new java.awt.Dimension(500, 5));
         setResizable(false);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 450, Short.MAX_VALUE)
-        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(65, 65, 65)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(435, Short.MAX_VALUE))
+            .addGap(0, 398, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 251, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
     
     @Override

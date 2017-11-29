@@ -22,7 +22,6 @@ public class Drawing {
     }    
     
     public static void draw(Graphics g, ImageIcon imageIcon, double y, double x) {
-        //System.out.println("y="+(y * Consts.CELL_SIZE)+", x="+(x * Consts.CELL_SIZE));
         imageIcon.paintIcon(screen, g, (int)Math.round(y * Consts.CELL_SIZE),(int)Math.round(x * Consts.CELL_SIZE));
     }
 }

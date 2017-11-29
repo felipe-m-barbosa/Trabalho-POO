@@ -16,7 +16,6 @@ import utils.Som;
  */
 public class GameController {
     
-    private Graphics tela;
     ImageIcon imageIcon;
     
     public GameController()
@@ -30,17 +29,32 @@ public class GameController {
         }
     }
     
-    public void drawAllElements(ArrayList<Element> elemArray, Graphics g){
-        this.tela = g;
+    public void drawDynamicElements(ArrayList<Element> elemArray, Graphics g){
         
         for(int i=0; i<elemArray.size(); i++){
-            elemArray.get(i).autoDraw(g);
+            if (elemArray.get(i) instanceof Pacman || elemArray.get(i) instanceof Fantasma){
+                elemArray.get(i).autoDraw(g);
+            }
         }
     }
     
-    public void processAllElements(ArrayList<Element> e, Pacman pacman, Som som){
-        if(e.isEmpty())
+    public void processAllElements(ArrayList<Element> e, Pacman pacman, Fantasma vermelho, Fantasma rosa, Fantasma ciano, Fantasma laranja, Som som){
+        
+        if(e.isEmpty()){
             return;
+        }
+        
+        //variavel temporaria de Element para fazer os testes
+        Element eTemp;
+        int i;
+        
+        //Pegando os fantasmas
+        for(i = 1; i < e.size(); i++){
+            eTemp = e.get(i);
+            if(eTemp instanceof Fantasma){
+                break;
+            }
+        }
         
         if (!isValidPosition(e, pacman)) {
             pacman.backToLastPosition();
@@ -49,26 +63,56 @@ public class GameController {
             return;
         }
         
-        Element eTemp;
-        BackgroundElement powerPellet;
         
-        for(int i = 1; i < e.size(); i++){
+        if (!isValidPosition(e, vermelho)) {
+            vermelho.backToLastPosition();
+            vermelho.setMovDirection(Fantasma.STOP);
+            return;
+        }
+        /*
+        if (!isValidPosition(e, rosa)) {
+            rosa.backToLastPosition();
+            rosa.setMovDirection(Fantasma.STOP);
+            return;
+        }
+        if (!isValidPosition(e, ciano)) {
+            ciano.backToLastPosition();
+            ciano.setMovDirection(Fantasma.STOP);
+            return;
+        }
+        if (!isValidPosition(e, laranja)) {
+            laranja.backToLastPosition();
+            laranja.setMovDirection(Fantasma.STOP);
+            return;
+        }
+        */
+        
+        
+        
+        BackgroundElement pacDot;  //acho que é interessante mudar o nome dessa variavel
+        
+        for(i = 1; i < e.size(); i++){
             eTemp = e.get(i);
-            if(pacman.overlap(eTemp))
-            {
-                if(eTemp.isTransposable())
-                {
-                    if (eTemp instanceof BackgroundElement)
-                    {
-                        if (((BackgroundElement)eTemp).getTipo().equals("caminho"))
-                        {
-                            powerPellet = (BackgroundElement)eTemp;
-                            if (powerPellet.getHasPowerPellet())
-                            {
-                                powerPellet.setHasPowerPellet(false);
-                                ((BackgroundElement) eTemp).imageIcon = this.imageIcon;
-                                eTemp.autoDraw(tela);
+            if(pacman.overlap(eTemp)){
+                if(eTemp.isTransposable()){
+                    if (eTemp instanceof BackgroundElement){
+                        if (((BackgroundElement)eTemp).getTipo().equals("caminho")){
+                            pacDot = (BackgroundElement)eTemp;
+                            if (pacDot.getTemPacDot()){
+                                pacDot.setTemPacDot(false);
+                                pacDot.setNomeImagem("caminho_vinho.png");
+                                //pacman ganha pontos
+                                pacman.pontuacao = pacman.pontuacao + 10; 
+                                //Trocou a imagem. Logo, o pacman comeu a pacdot e diminui o número de pacdots.
+                                Stage.numPacDots--;
                             }
+                        }
+                    }
+                    else{
+                        if(eTemp instanceof Fantasma){
+                            //Gasta um vida
+                            pacman.vidas = pacman.vidas - 1;
+                            pacman.setPosition(3, 1);
                         }
                     }
                 }
@@ -76,6 +120,8 @@ public class GameController {
         }
         
         pacman.move();
+        vermelho.moveFantasma();
+        //Aqui entra os move dos fantasma !!!!?????
     }
     
     //Testa validade da posição. Usado para testar colisões com paredes e fantasmas no modo normal.

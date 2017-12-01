@@ -18,11 +18,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import utils.Position;
 import utils.Som;
 
 /**
@@ -34,7 +36,14 @@ import utils.Som;
 public class Stage extends javax.swing.JFrame implements KeyListener {
     
     public long tempo = 0;
-    public static long tempoInicio;
+    public static long tempoMorango;
+    public static long tempoCereja;
+    public static long tempoSomeMorango;
+    public static long tempoSomeCereja;
+    public int colocaMorango = 0;
+    public int colocaCereja = 0;
+    public int posicaoMorango;
+    public int posicaoCereja;
     public static Graphics g;
     public static Graphics g2;
     public int fase = 0;
@@ -194,8 +203,27 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
             if ((elementosCenario.get(i) instanceof BackgroundElement))
             {
                 try {
-                    Image newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + elementosCenario.get(i).getNomeImagem());
-                    g2.drawImage(newImage, (int)elementosCenario.get(i).pos.getY() * Consts.CELL_SIZE, (int)elementosCenario.get(i).pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
+                    //verifica se é background
+                    if(elementosCenario.get(i) instanceof BackgroundElement){
+                        BackgroundElement teste = (BackgroundElement)elementosCenario.get(i);
+                        if(teste.getTemFruta() == true){
+                            if(teste.getTipoFruta() == "morango"){
+                                Image newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + elementosCenario.get(i).getNomeImagem());
+                                g2.drawImage(newImage, (int)elementosCenario.get(i).pos.getY() * Consts.CELL_SIZE, (int)elementosCenario.get(i).pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
+                            }
+                            else{
+                                System.out.println("Achou uma frutinha");
+                                System.out.println(elementosCenario.get(i).getNomeImagem());
+                                Image newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + elementosCenario.get(i).getNomeImagem());
+                                g2.drawImage(newImage, (int)elementosCenario.get(i).pos.getY() * Consts.CELL_SIZE, (int)elementosCenario.get(i).pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
+                            }
+                        }
+                        else{
+                            Image newImage = Toolkit.getDefaultToolkit().getImage(new java.io.File(".").getCanonicalPath() + Consts.PATH + elementosCenario.get(i).getNomeImagem());
+                            g2.drawImage(newImage, (int)elementosCenario.get(i).pos.getY() * Consts.CELL_SIZE, (int)elementosCenario.get(i).pos.getX() * Consts.CELL_SIZE, Consts.CELL_SIZE, Consts.CELL_SIZE, null);
+                        }
+                    //esse pedaço de cima pode não funcionar
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(Stage.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -239,16 +267,83 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
                     novoJogo();
                 }
                 
-                if ((System.currentTimeMillis() - tempoInicio)/1000 > 20)
+                //tira as frutas velhas
+                tiraFrutas();
+                
+                if ((System.currentTimeMillis() - tempoMorango)/1000 > 75)
                 {
-                    System.out.println("DEUUUUUUUUUU");
-                    tempoInicio = System.currentTimeMillis();
+                    sorteiaPosicaoFruta(1);
+                    tempoMorango = System.currentTimeMillis();
+                    tempoSomeMorango = System.currentTimeMillis();
                 }
+                if ((System.currentTimeMillis() - tempoCereja)/1000 > 50)
+                {
+                    sorteiaPosicaoFruta(2);
+                    tempoCereja = System.currentTimeMillis();
+                    tempoSomeCereja = System.currentTimeMillis();
+                }
+                //trecho que chama as funções de mvoer os fantasmas
+                //moveFantasmaVermelho();
+                //moveFantasmaRosa();
+                //moveFantasmaCiano();
+                //moveFantasmaLaranja();
             }
         };
         Timer timer = new Timer();
         timer.schedule(task, 0, Consts.DELAY);
         
+    }
+    
+    public void tiraFrutas(){
+        if((System.currentTimeMillis() - tempoSomeCereja)/1000 > 15){
+            //zera o tempo
+            tempoSomeCereja = 0;
+            //tira a fruta
+            BackgroundElement fruta = (BackgroundElement)caminho.get(posicaoCereja);
+            if(fruta.getTemPacDot() == true){
+                fruta.setTemFruta(false);
+                fruta.setNomeImagem("caminho_vinho_com_pp.png");
+            }
+            else{
+                fruta.setTemFruta(false);
+                fruta.setNomeImagem("caminho_vinho.png");
+            }
+        }
+        if((System.currentTimeMillis() - tempoSomeMorango)/1000 > 15){
+            //zera o tempo
+            tempoSomeMorango = 0;
+            //tira a fruta
+            BackgroundElement fruta = (BackgroundElement)caminho.get(posicaoMorango);
+            if(fruta.getTemPacDot() == true){
+                fruta.setTemFruta(false);
+                fruta.setNomeImagem("caminho_vinho_com_pp.png");
+            }
+            else{
+                fruta.setTemFruta(false);
+                fruta.setNomeImagem("caminho_vinho.png");
+            }
+        }
+    }
+    
+    public void sorteiaPosicaoFruta(int fruta){
+        //1 morango
+        //2 cereja
+        //sortei um numero
+        Random random = new Random();
+        int i = random.nextInt((caminho.size() - 0) + 1) + 0;
+        BackgroundElement posicao = (BackgroundElement)caminho.get(i);
+        if(fruta == 1){
+            posicaoMorango = i;
+            posicao.setTemFruta(true);
+            posicao.setTipoFruta("morango");
+            posicao.setNomeImagem("morango.png");
+        }
+        else{
+            posicaoCereja = i;
+            posicao.setTemFruta(true);
+            posicao.setTipoFruta("cereja");
+            posicao.setNomeImagem("cereja.png");
+        }
     }
     
     //Função que muda o movimento do pacman de acordo com a tecla pressionada
@@ -281,6 +376,9 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
             default:
                 break;
         }
+        
+        //Baseado no que o pacman vai fazer os fantasmas fazem seus movimentos
+        moveFantasmaVermelho();
     }
     
     private void salvarJogo()
@@ -366,7 +464,8 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     private void novoJogo()
     {
         //toda vez q começo um novo jogo, seto o valor de tempo inicial para este momento
-        tempoInicio = System.currentTimeMillis();
+        tempoMorango = System.currentTimeMillis();
+        tempoCereja = System.currentTimeMillis();
         
         paredes = new ArrayList<Element>();
         caminho = new ArrayList<Element>();
@@ -444,6 +543,50 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         //Número de PacDots do cenário. Quando chega a 0, mudamos de fase.
         numPacDots = caminho.size();
     }
+    
+    
+    //Este fantasma segue o pacman o tempo inteiro
+    public void moveFantasmaVermelho(){
+        //pegando as informações do pisição do fantasma e do pacman
+        Position posVermelho = vermelho.pos;
+        Position posPacman = pacman.pos;
+        
+        //trabalhando com as posições
+        //por enquanto ainda não sei o que fazer com elas
+        
+        //pega a direção de movimento do pacman e ve a direção
+        switch(pacman.getMovDirection()){
+            case Pacman.MOVE_LEFT:
+                vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                break;
+            case Pacman.MOVE_RIGHT:
+                vermelho.setMovDirection(Fantasma.MOVE_RIGHT);
+                break;
+            case Pacman.MOVE_UP:
+                vermelho.setMovDirection(Fantasma.MOVE_UP);
+                break;
+            case Pacman.MOVE_DOWN:
+                vermelho.setMovDirection(Fantasma.MOVE_DOWN);
+                break;
+            default:
+                vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                break;
+        }
+    }
+    
+    public void moveFantasmaRosa(){
+        //
+    }
+    
+    public void moveFantasmaCiano(){
+        //
+    }
+    
+    public void moveFantasmaLaranja(){
+        //
+    }
+    
+    
     
     /**
      * This method is called from within the constructor to initialize the form.

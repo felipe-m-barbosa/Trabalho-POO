@@ -107,13 +107,5 @@ public class Fantasma extends Element  implements Serializable{
         } catch (IOException ex) {
             Logger.getLogger(Fantasma.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    //Função para fazer o fantasma andar de maneira logica
-    public void moveFantasma(){
-        this.moveLeft();
-        //
-    }
-    
-    
+    } 
 }

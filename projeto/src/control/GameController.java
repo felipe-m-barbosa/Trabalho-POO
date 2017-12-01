@@ -4,6 +4,7 @@ import elements.*;
 import java.awt.Graphics;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import utils.Consts;
 import utils.Som;
@@ -39,7 +40,6 @@ public class GameController {
     }
     
     public void processAllElements(ArrayList<Element> e, Pacman pacman, Fantasma vermelho, Fantasma rosa, Fantasma ciano, Fantasma laranja, Som som){
-        
         if(e.isEmpty()){
             return;
         }
@@ -58,6 +58,8 @@ public class GameController {
         
         if (!isValidPosition(e, pacman)) {
             pacman.backToLastPosition();
+            //pegando a direção atual
+            System.out.println(pacman.getMovDirection());
             pacman.setMovDirection(Pacman.STOP);
             som.parar();
             return;
@@ -66,7 +68,11 @@ public class GameController {
         
         if (!isValidPosition(e, vermelho)) {
             vermelho.backToLastPosition();
-            vermelho.setMovDirection(Fantasma.STOP);
+            //vamos gerar uma direção aleatorio então, já que o fantasma não pode parar
+            Random random = new Random();
+            int sorteio = random.nextInt(4);
+            System.out.println(sorteio);
+            vermelho.setMovDirection(sorteio+1);
             return;
         }
         /*
@@ -87,8 +93,6 @@ public class GameController {
         }
         */
         
-        
-        
         BackgroundElement pacDot;  //acho que é interessante mudar o nome dessa variavel
         
         for(i = 1; i < e.size(); i++){
@@ -106,6 +110,22 @@ public class GameController {
                                 //Trocou a imagem. Logo, o pacman comeu a pacdot e diminui o número de pacdots.
                                 Stage.numPacDots--;
                             }
+                            if (pacDot.getTemFruta()){
+                                if(pacDot.getTipoFruta() == "morango"){
+                                    pacDot.setTemFruta(false);
+                                    pacDot.setNomeImagem("caminho_vinho.png");
+                                    //pacman ganha pontos
+                                    pacman.pontuacao = pacman.pontuacao + 300; 
+                                    //Trocou a imagem. Logo, o pacman comeu a fruta.
+                                }
+                                else{
+                                    pacDot.setTemFruta(false);
+                                    pacDot.setNomeImagem("caminho_vinho.png");
+                                    //pacman ganha pontos
+                                    pacman.pontuacao = pacman.pontuacao + 100; 
+                                    //Trocou a imagem. Logo, o pacman comeu a fruta.
+                                }
+                            }
                         }
                     }
                     else{
@@ -120,7 +140,7 @@ public class GameController {
         }
         
         pacman.move();
-        vermelho.moveFantasma();
+        vermelho.move();
         //Aqui entra os move dos fantasma !!!!?????
     }
     

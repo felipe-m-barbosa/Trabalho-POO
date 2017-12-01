@@ -34,7 +34,7 @@ public class BackgroundElement extends Element{
         this.tipoFruta = tipoFruta;
     }
 
-    public boolean isTemPowerPallet() {
+    public boolean getTemPowerPallet() {
         return temPowerPallet;
     }
 
@@ -42,7 +42,7 @@ public class BackgroundElement extends Element{
         this.temPowerPallet = temPowerPallet;
     }
 
-    public boolean isTemFruta() {
+    public boolean getTemFruta() {
         return temFruta;
     }
 

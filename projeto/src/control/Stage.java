@@ -394,6 +394,9 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         
         //Baseado no que o pacman vai fazer os fantasmas fazem seus movimentos
         moveFantasmaVermelho();
+        moveFantasmaRosa();
+        moveFantasmaCiano();
+        moveFantasmaLaranja();
     }
     
     private void salvarJogo()
@@ -563,6 +566,10 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         vermelho.setPosition(14, 14);
         this.addElement(vermelho);
         
+        rosa = new Fantasma("blinky_baixo.png");
+        rosa.setPosition(15, 14);
+        this.addElement(rosa);
+        
         //Número de PacDots do cenário. Quando chega a 0, mudamos de fase.
         numPacDots = caminho.size();
     }
@@ -577,36 +584,114 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         //trabalhando com as posições
         //por enquanto ainda não sei o que fazer com elas
         
-        //pega a direção de movimento do pacman e ve a direção
-        switch(pacman.getMovDirection()){
-            case Pacman.MOVE_LEFT:
-                vermelho.setMovDirection(Fantasma.MOVE_LEFT);
-                break;
-            case Pacman.MOVE_RIGHT:
-                vermelho.setMovDirection(Fantasma.MOVE_RIGHT);
-                break;
-            case Pacman.MOVE_UP:
-                vermelho.setMovDirection(Fantasma.MOVE_UP);
-                break;
-            case Pacman.MOVE_DOWN:
-                vermelho.setMovDirection(Fantasma.MOVE_DOWN);
-                break;
-            default:
-                vermelho.setMovDirection(Fantasma.MOVE_LEFT);
-                break;
+        //pega a direção de movimento do pacman e ve a direção se a power pellet não esta ativa
+        if(powerPelletAtiva == false){
+            switch(pacman.getMovDirection()){
+                case Pacman.MOVE_LEFT:
+                    vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+                case Pacman.MOVE_RIGHT:
+                    vermelho.setMovDirection(Fantasma.MOVE_RIGHT);
+                    break;
+                case Pacman.MOVE_UP:
+                    vermelho.setMovDirection(Fantasma.MOVE_UP);
+                    break;
+                case Pacman.MOVE_DOWN:
+                    vermelho.setMovDirection(Fantasma.MOVE_DOWN);
+                    break;
+                default:
+                    vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+            }
+        }
+        else{
+            switch(pacman.getMovDirection()){
+                case Pacman.MOVE_LEFT:
+                    vermelho.setMovDirection(Fantasma.MOVE_RIGHT);
+                    break;
+                case Pacman.MOVE_RIGHT:
+                    vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+                case Pacman.MOVE_UP:
+                    vermelho.setMovDirection(Fantasma.MOVE_DOWN);
+                    break;
+                case Pacman.MOVE_DOWN:
+                    vermelho.setMovDirection(Fantasma.MOVE_UP);
+                    break;
+                default:
+                    vermelho.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+            }
+            //Coloca a figura dele com medo !!!
         }
     }
     
     public void moveFantasmaRosa(){
-        //
+        System.out.println("Entrou");
+        //pegando as informações do pisição do fantasma e do pacman
+        Position posRosa = rosa.pos;
+        Position posPacman = pacman.pos;
+        
+        //trabalhando com as posições
+        //por enquanto ainda não sei o que fazer com elas
+        
+        //pega a direção de movimento do pacman e ve a direção se a power pellet não esta ativa
+        //este fantasma se move em paralelo com o pacman para encurralar
+        if(powerPelletAtiva == false){
+            Random random = new Random();
+            int sorteio;
+            switch(pacman.getMovDirection()){
+                case Pacman.MOVE_LEFT:
+                    sorteio = random.nextInt(4);
+                    rosa.setMovDirection(sorteio+1);
+                    break;
+                case Pacman.MOVE_RIGHT:
+                    sorteio = random.nextInt(4);
+                    rosa.setMovDirection(sorteio+1);;
+                    break;
+                case Pacman.MOVE_UP:
+                    rosa.setMovDirection(Fantasma.MOVE_UP);
+                    break;
+                case Pacman.MOVE_DOWN:
+                    rosa.setMovDirection(Fantasma.MOVE_DOWN);
+                    break;
+                default:
+                    rosa.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+            }
+        }
+        else{
+            Random random = new Random();
+            int sorteio;
+            switch(pacman.getMovDirection()){
+                case Pacman.MOVE_LEFT:
+                    sorteio = random.nextInt(4);
+                    rosa.setMovDirection(sorteio+1);
+                    break;
+                case Pacman.MOVE_RIGHT:
+                    sorteio = random.nextInt(4);
+                    rosa.setMovDirection(sorteio+1);
+                    break;
+                case Pacman.MOVE_UP:
+                    vermelho.setMovDirection(Fantasma.MOVE_DOWN);
+                    break;
+                case Pacman.MOVE_DOWN:
+                    rosa.setMovDirection(Fantasma.MOVE_UP);
+                    break;
+                default:
+                    rosa.setMovDirection(Fantasma.MOVE_LEFT);
+                    break;
+            }
+            //Coloca a figura dele com medo !!!
+        }
     }
     
     public void moveFantasmaCiano(){
-        //
+        //Ainda não feito
     }
     
     public void moveFantasmaLaranja(){
-        //
+        //Ainda não feito
     }
     
     

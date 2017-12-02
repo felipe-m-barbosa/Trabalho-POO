@@ -71,16 +71,18 @@ public class GameController {
             //vamos gerar uma direção aleatorio então, já que o fantasma não pode parar
             Random random = new Random();
             int sorteio = random.nextInt(4);
-            System.out.println(sorteio);
             vermelho.setMovDirection(sorteio+1);
             return;
         }
-        /*
         if (!isValidPosition(e, rosa)) {
             rosa.backToLastPosition();
-            rosa.setMovDirection(Fantasma.STOP);
+            //vamos gerar uma direção aleatorio então, já que o fantasma não pode parar
+            Random random = new Random();
+            int sorteio = random.nextInt(4);
+            rosa.setMovDirection(sorteio+1);
             return;
         }
+        /*
         if (!isValidPosition(e, ciano)) {
             ciano.backToLastPosition();
             ciano.setMovDirection(Fantasma.STOP);
@@ -155,6 +157,9 @@ public class GameController {
         
         pacman.move();
         vermelho.move();
+        rosa.move();
+        //ciano.move();
+        //laranja.move();
         //Aqui entra os move dos fantasma !!!!?????
     }
     

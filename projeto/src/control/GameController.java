@@ -93,7 +93,7 @@ public class GameController {
         }
         */
         
-        BackgroundElement pacDot;  //acho que é interessante mudar o nome dessa variavel
+        BackgroundElement elementoCoringa;  //acho que é interessante mudar o nome dessa variavel
         
         for(i = 1; i < e.size(); i++){
             eTemp = e.get(i);
@@ -101,30 +101,44 @@ public class GameController {
                 if(eTemp.isTransposable()){
                     if (eTemp instanceof BackgroundElement){
                         if (((BackgroundElement)eTemp).getTipo().equals("caminho")){
-                            pacDot = (BackgroundElement)eTemp;
-                            if (pacDot.getTemPacDot()){
-                                pacDot.setTemPacDot(false);
-                                pacDot.setNomeImagem("caminho_vinho.png");
+                            elementoCoringa = (BackgroundElement)eTemp;
+                            if (elementoCoringa.getTemPacDot()){
+                                elementoCoringa.setTemPacDot(false);
+                                elementoCoringa.setNomeImagem("caminho_vinho.png");
                                 //pacman ganha pontos
                                 pacman.pontuacao = pacman.pontuacao + 10; 
                                 //Trocou a imagem. Logo, o pacman comeu a pacdot e diminui o número de pacdots.
                                 Stage.numPacDots--;
                             }
-                            if (pacDot.getTemFruta()){
-                                if(pacDot.getTipoFruta() == "morango"){
-                                    pacDot.setTemFruta(false);
-                                    pacDot.setNomeImagem("caminho_vinho.png");
+                            if (elementoCoringa.getTemFruta()){
+                                if(elementoCoringa.getTipoFruta() == "morango"){
+                                    elementoCoringa.setTemFruta(false);
+                                    elementoCoringa.setNomeImagem("caminho_vinho.png");
                                     //pacman ganha pontos
                                     pacman.pontuacao = pacman.pontuacao + 300; 
                                     //Trocou a imagem. Logo, o pacman comeu a fruta.
                                 }
                                 else{
-                                    pacDot.setTemFruta(false);
-                                    pacDot.setNomeImagem("caminho_vinho.png");
+                                    elementoCoringa.setTemFruta(false);
+                                    elementoCoringa.setNomeImagem("caminho_vinho.png");
                                     //pacman ganha pontos
                                     pacman.pontuacao = pacman.pontuacao + 100; 
                                     //Trocou a imagem. Logo, o pacman comeu a fruta.
                                 }
+                            }
+                        }
+                        if(((BackgroundElement)eTemp).getTipo().equals("powerpellet")){
+                            elementoCoringa = (BackgroundElement)eTemp;
+                            if (elementoCoringa.getTemPowerPallet()){
+                                System.out.println("entrou");
+                                elementoCoringa.setTemPowerPallet(false);
+                                elementoCoringa.setNomeImagem("caminho_vinho.png");
+                                //pacman ganha pontos
+                                pacman.pontuacao = pacman.pontuacao + 110; 
+                                //Trocou a imagem. Logo, o pacman comeu a pacdot e diminui o número de pacdots.
+                                Stage.numPacDots--;
+                                //precisamos ativar o poder dado pela power pellet
+                                pacman.setPowerPelletComida(true);
                             }
                         }
                     }

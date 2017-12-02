@@ -24,6 +24,10 @@ public class BackgroundElement extends Element{
             this.isTransposable = false;
         if (tipo.equals("caminho"))
             this.temPacDot = true;
+        if (tipo.equals("powerpellet")){
+            this.temPacDot = true;
+            this.temPowerPallet = true;
+        }
     }
 
     public String getTipoFruta() {

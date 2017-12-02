@@ -38,8 +38,10 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     public long tempo = 0;
     public static long tempoMorango;
     public static long tempoCereja;
+    public static long tempoPowerPellet;
     public static long tempoSomeMorango;
     public static long tempoSomeCereja;
+    public boolean powerPelletAtiva = false;
     public int colocaMorango = 0;
     public int colocaCereja = 0;
     public int posicaoMorango;
@@ -74,11 +76,11 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
     {'|', ' ', '^', '^', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '|', ' ', '^', '^', '^', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
     {'|', ' ', '^', '^', '^', '|', ' ', '^', '^', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
     {'|', ' ', '_', '_', '_', '+', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '_', '_', '_', '+', ' ', '|'},
-    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '^', '_', '_', ' ', ' ', '_', '_', '|', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', '!', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '^', '_', '_', ' ', ' ', '_', '_', '|', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', '!', '|'},
     {'_', '_', '_', '_', '_', '_', ' ', '_', '+', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '_', '+', ' ', '_', '_', '_', '_', '_', '+'},
     {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
     {'^', '_', '_', '_', '_', '_', ' ', '^', '|', ' ', '^', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', '^', '|', ' ', '_', '_', '_', '_', '_', '|'},
-    {'|', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
+    {'|', '!', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '_', '_', '_', '_', '_', '_', '_', '+', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', '!', '|'},
     {'|', ' ', '^', '^', '^', '|', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', '^', '^', '^', '|', ' ', '|'},
     {'|', ' ', '_', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '^', '^', '_', '_', '+', ' ', '_', '+', ' ', '_', '_', '_', '+', ' ', '|'},
     {'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|'},
@@ -242,6 +244,10 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
         g2.drawString(pontos, 5, 35);
         g2.setFont(new Font("TimesRoman", Font.BOLD, 30));
         g2.drawString(faseString, 220, 25);
+        String powerPellet = "Power: ";
+        if(powerPelletAtiva == true){
+            g2.drawString(powerPellet, 350, 25);
+        }
         
         this.controller.drawDynamicElements(elementosCenario, g2);
         this.controller.processAllElements(elementosCenario, pacman, vermelho, rosa, ciano, laranja,som);
@@ -270,6 +276,7 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
                 //tira as frutas velhas
                 tiraFrutas();
                 
+                //coloca as frutas
                 if ((System.currentTimeMillis() - tempoMorango)/1000 > 75)
                 {
                     sorteiaPosicaoFruta(1);
@@ -282,11 +289,19 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
                     tempoCereja = System.currentTimeMillis();
                     tempoSomeCereja = System.currentTimeMillis();
                 }
-                //trecho que chama as funções de mvoer os fantasmas
-                //moveFantasmaVermelho();
-                //moveFantasmaRosa();
-                //moveFantasmaCiano();
-                //moveFantasmaLaranja();
+                
+                //verifica se power pellet foi comida
+                if(pacman.getPowerPelletComida()){
+                    powerPelletAtiva = true;
+                    tempoPowerPellet = System.currentTimeMillis();
+                    pacman.setPowerPelletComida(false);
+                }
+                
+                //verifica se deve acabar o poder de power pellet
+                if(((System.currentTimeMillis() - tempoPowerPellet)/1000 > 10) && (powerPelletAtiva == true)){
+                    powerPelletAtiva = false;
+                    tempoPowerPellet = 0;
+                }
             }
         };
         Timer timer = new Timer();
@@ -500,6 +515,14 @@ public class Stage extends javax.swing.JFrame implements KeyListener {
                 else if(mapa[fase][i][j] == ' ')
                 {
                     BackgroundElement caminhoLivre = new BackgroundElement("caminho","caminho_vinho_com_pp.png");
+                    caminhoLivre.setPosition(i, j);
+                    caminhoLivre.setI(i);
+                    caminhoLivre.setJ(j);
+                    caminho.add(caminhoLivre);
+                }
+                else if(mapa[fase][i][j] == '!')
+                {
+                    BackgroundElement caminhoLivre = new BackgroundElement("powerpellet","caminho_vinho_com_power_pellet.png");
                     caminhoLivre.setPosition(i, j);
                     caminhoLivre.setI(i);
                     caminhoLivre.setJ(j);

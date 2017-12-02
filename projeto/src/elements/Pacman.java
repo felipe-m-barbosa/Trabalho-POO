@@ -30,6 +30,15 @@ public class Pacman extends Element  implements Serializable{
     public static final int MOVE_DOWN = 4;
     public int pontuacao;
     public int vidas;
+    public boolean powerPelletComida = false;
+
+    public boolean getPowerPelletComida() {
+        return powerPelletComida;
+    }
+
+    public void setPowerPelletComida(boolean powerPelletComida) {
+        this.powerPelletComida = powerPelletComida;
+    }
     
     private int movDirection = STOP;
     
